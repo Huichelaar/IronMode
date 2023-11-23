@@ -86,9 +86,13 @@ struct PlaySt_OptionBits {
 
 extern u8 gUnknown_02000940[4];
 extern u8 gUnknown_02000944[4];
-extern struct PlaySt_OptionBits gUnknown_02000948[];
+extern struct PlaySt_OptionBits gUnknown_02000948[4];
 
 const int GetValueFromEasingFunction(u8 rateFunction, int startX, int endX, u32 currentT, u32 endT); //! FE8U = 0x8012DCC;
+
+extern const int GetLastUsedGameSaveSlot(); //! FE8U = 0x80A4DA0
+extern const u8 SaveMetadata_CheckId(int slot); //! FE8U = 0x80A5218
+extern const void LoadSavedChapterState(int slot, ChapterState* PlaySt); //! FE8U = 0x80A522C
 
 extern const void loadDifficultyPal(int config, int slot); //! FE8U = 0x080895B4
 extern const void savemenu_SetDifficultyChoice(int difficulty, int unk_1); //! FE8U = 0x080AA52C
@@ -117,6 +121,10 @@ const void IMM_drawDifficultySpritesLoop(struct DifficultyMenuSpritesProc * proc
 const void IMM_swapSprites(struct DifficultyMenuProc* proc);
 
 const struct ProcInstruction IMM_difficultySelectProc[];
+
+const void IMM_findInitialCopyDataSave(Proc* saveMenuProc);
+const s8 IMM_copyDataSlotMove(Proc* saveMenuProc, u8 previous, s8 direction);
+const u8 IMM_saveMenuModifySaveSlot(u8 slot, int flag, int direction);
 
 extern ObjData IMM_classicTextOAM;
 extern ObjData IMM_ironTextOAM;

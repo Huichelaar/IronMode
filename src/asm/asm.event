@@ -1,0 +1,28 @@
+PUSH
+
+  // Disable Restart option if Iron suspended save exists.
+  ORG 0xAB8E0
+    jumpToHack(IMM_disableRestart)
+  
+  // Disable Copy Data if there is no non-iron save.
+  ORG 0xAB8EC
+    jumpToHack(IMM_disableCopyData)
+  
+  // Disable New Game option if Iron suspended save exists.
+  ORG 0xAB900
+    jumpToHack(IMM_disableNewGame)
+  
+  // Disable moving cursor when saving on an iron save.
+  ORG 0xABA00
+    jumpToHack(IMM_disableCursorMoveDuringSave)
+
+POP
+
+ALIGN 4; IMM_disableRestart:
+#include "disableRestart.lyn.event"
+ALIGN 4; IMM_disableNewGame:
+#include "disableNewGame.lyn.event"
+ALIGN 4; IMM_disableCopyData:
+#include "disableCopyData.lyn.event"
+ALIGN 4; IMM_disableCursorMoveDuringSave:
+#include "disableCursorMoveDuringSave.lyn.event"

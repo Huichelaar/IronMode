@@ -13,11 +13,13 @@ ALIGN 4; IMM_difficultySelectGfx:
 
 // Options OAM.
 ALIGN 4; IMM_classicTextOAM:
+MESSAGE classicTextOAM at CurrentOffset
 SHORT 2
 SHORT 0x4008 0x802B 0x08D2
 SHORT 0x0008 0x404B 0x08D6
 
 ALIGN 4; IMM_ironTextOAM:
+MESSAGE ironTextOAM at CurrentOffset
 SHORT 1
 SHORT 0x4008 0x8034 0x08D8
 

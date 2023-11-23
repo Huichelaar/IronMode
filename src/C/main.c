@@ -247,6 +247,76 @@ PROC_LABEL(2),
   PROC_END
 };
 
+// Used to determine if current save file should be selectable after
+// selecting Copy Data.
+// Avoids iron save files.
+const void IMM_findInitialCopyDataSave(Proc* saveMenuProc) {
+  u8* saveSlot = (u8*)((u32)saveMenuProc+0x2C);
+  *saveSlot = IMM_saveMenuModifySaveSlot(GetLastUsedGameSaveSlot(), 1, 1);
+  ProcGoto(saveMenuProc, 3);
+}
+
+// Used to determine where to move copy cursor when selecting save file to copy.
+// Avoids iron save files.
+// pevious contains previous saveslot value. castB contains direction of moving.
+const s8 IMM_copyDataSlotMove(Proc* saveMenuProc, u8 previous, s8 direction) {
+  u8* cursorIndex = (u8*)((u32)saveMenuProc+0x2D);
+  u8* saveSlot = (u8*)((u32)saveMenuProc+0x2C);
+  s8 flag = 0;
+  
+  if (*cursorIndex == 0xFF)
+    flag = 1;
+  
+  if (direction >= 1) {
+    if (*saveSlot == 2)
+      *saveSlot = 0;
+    else
+      *saveSlot += 1;
+  } else {
+    if (*saveSlot == 0)
+      *saveSlot = 2;
+    else
+      *saveSlot -= 1;
+  }
+  
+  *saveSlot = IMM_saveMenuModifySaveSlot(*saveSlot, flag, direction);
+
+  if (previous == *saveSlot)
+    return 0;
+  return 1;
+}
+
+// Specialized version of SaveMenuModifySaveSlot, 0x80AB9FC.
+// Ignores iron saves when looking for existing saves.
+const u8 IMM_saveMenuModifySaveSlot(u8 slot, int flag, int direction) {
+  u8 i;
+  
+  for (i = 0; i < 3; i++) {
+    if (SaveMetadata_CheckId(slot) == flag) {
+      if (!flag) {
+        return slot;
+      }
+      else {
+        if (!gUnknown_02000948[slot].rankDisplay) {     // rankDisplay repurposed for Iron mode.
+          return slot;
+        }
+      }
+    }
+    if (direction > 0) {
+      if (slot == 2)
+        slot = 0;
+      else
+        slot += 1;
+    } else {
+      if (slot == 0)
+        slot = 2;
+      else
+        slot -= 1;
+    }
+  }
+  return 0xFF;
+}
+
 /*
 Based on 0x80895B4.
   config:

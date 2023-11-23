@@ -616,9 +616,167 @@ IMM_drawDifficultySpritesLoop:
 	.word	DifficultyMenuSelectedPaletteLoop
 	.word	DrawDifficultyMenuCursor
 	.size	IMM_drawDifficultySpritesLoop, .-IMM_drawDifficultySpritesLoop
+	.align	1
+	.global	IMM_saveMenuModifySaveSlot
+	.syntax unified
+	.code	16
+	.thumb_func
+	.fpu softvfp
+	.type	IMM_saveMenuModifySaveSlot, %function
+IMM_saveMenuModifySaveSlot:
+	@ Function supports interworking.
+	@ args = 0, pretend = 0, frame = 8
+	@ frame_needed = 0, uses_anonymous_args = 0
+	push	{r0, r1, r2, r4, r5, r6, r7, lr}
+	movs	r6, r1
+	movs	r4, r0
+	movs	r5, #3
+	movs	r7, #2
+	str	r2, [sp, #4]
+.L72:
+	movs	r0, r4
+	ldr	r3, .L83
+	bl	.L14
+	cmp	r0, r6
+	bne	.L68
+	cmp	r6, #0
+	beq	.L69
+	ldr	r3, .L83+4
+	lsls	r2, r4, #3
+	adds	r3, r3, r2
+	ldrb	r3, [r3, #2]
+	lsls	r3, r3, #25
+	bpl	.L69
+.L68:
+	ldr	r3, [sp, #4]
+	cmp	r3, #0
+	ble	.L70
+	cmp	r4, #2
+	beq	.L73
+	adds	r4, r4, #1
+.L82:
+	lsls	r4, r4, #24
+	lsrs	r4, r4, #24
+.L71:
+	subs	r5, r5, #1
+	lsls	r5, r5, #24
+	lsrs	r5, r5, #24
+	bne	.L72
+	movs	r4, #255
+.L69:
+	@ sp needed
+	movs	r0, r4
+	pop	{r1, r2, r3, r4, r5, r6, r7}
+	pop	{r1}
+	bx	r1
+.L70:
+	cmp	r4, #0
+	beq	.L74
+	subs	r4, r4, #1
+	b	.L82
+.L73:
+	movs	r4, #0
+	b	.L71
+.L74:
+	movs	r4, r7
+	b	.L71
+.L84:
+	.align	2
+.L83:
+	.word	SaveMetadata_CheckId
+	.word	gUnknown_02000948
+	.size	IMM_saveMenuModifySaveSlot, .-IMM_saveMenuModifySaveSlot
+	.align	1
+	.global	IMM_findInitialCopyDataSave
+	.syntax unified
+	.code	16
+	.thumb_func
+	.fpu softvfp
+	.type	IMM_findInitialCopyDataSave, %function
+IMM_findInitialCopyDataSave:
+	@ Function supports interworking.
+	@ args = 0, pretend = 0, frame = 0
+	@ frame_needed = 0, uses_anonymous_args = 0
+	push	{r4, lr}
+	ldr	r3, .L86
+	@ sp needed
+	movs	r4, r0
+	bl	.L14
+	movs	r2, #1
+	lsls	r0, r0, #24
+	movs	r1, r2
+	lsrs	r0, r0, #24
+	bl	IMM_saveMenuModifySaveSlot
+	movs	r3, r4
+	adds	r3, r3, #44
+	strb	r0, [r3]
+	movs	r1, #3
+	movs	r0, r4
+	ldr	r3, .L86+4
+	bl	.L14
+	pop	{r4}
+	pop	{r0}
+	bx	r0
+.L87:
+	.align	2
+.L86:
+	.word	GetLastUsedGameSaveSlot
+	.word	ProcGoto
+	.size	IMM_findInitialCopyDataSave, .-IMM_findInitialCopyDataSave
+	.align	1
+	.global	IMM_copyDataSlotMove
+	.syntax unified
+	.code	16
+	.thumb_func
+	.fpu softvfp
+	.type	IMM_copyDataSlotMove, %function
+IMM_copyDataSlotMove:
+	@ Function supports interworking.
+	@ args = 0, pretend = 0, frame = 0
+	@ frame_needed = 0, uses_anonymous_args = 0
+	movs	r3, r0
+	push	{r4, r5, r6, lr}
+	movs	r4, r0
+	adds	r3, r3, #45
+	movs	r5, r1
+	ldrb	r1, [r3]
+	adds	r4, r4, #44
+	subs	r1, r1, #255
+	rsbs	r3, r1, #0
+	adcs	r1, r1, r3
+	ldrb	r3, [r4]
+	cmp	r2, #0
+	ble	.L89
+	cmp	r3, #2
+	bne	.L90
+	movs	r3, #0
+.L93:
+	@ sp needed
+	strb	r3, [r4]
+	ldrb	r0, [r4]
+	bl	IMM_saveMenuModifySaveSlot
+	strb	r0, [r4]
+	subs	r0, r0, r5
+	subs	r3, r0, #1
+	sbcs	r0, r0, r3
+	pop	{r4, r5, r6}
+	pop	{r1}
+	bx	r1
+.L90:
+	adds	r3, r3, #1
+	b	.L93
+.L89:
+	cmp	r3, #0
+	bne	.L92
+	adds	r3, r3, #2
+	b	.L93
+.L92:
+	subs	r3, r3, #1
+	b	.L93
+	.size	IMM_copyDataSlotMove, .-IMM_copyDataSlotMove
 	.global	IMM_difficultySelectProc
 	.section	.rodata.str1.1,"aMS",%progbits,1
-.LC30:
+.LC34:
 	.ascii	"IMM_difficultySelectProc\000"
 	.global	BITPACKED
 	.section	.rodata
@@ -628,7 +786,7 @@ IMM_drawDifficultySpritesLoop:
 IMM_difficultySelectProc:
 	.short	1
 	.short	0
-	.word	.LC30
+	.word	.LC34
 	.short	4
 	.short	0
 	.word	134922361

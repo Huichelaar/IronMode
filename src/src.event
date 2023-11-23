@@ -1,5 +1,7 @@
 // C
 #include "C/main.lyn.event"
+// ASM
+#include "asm/asm.event"
 
 PUSH
 
@@ -41,9 +43,42 @@ PUSH
     SHORT 0x7800        // ldrb r0, [r0]            @ Vanilla.
     SHORT 0x0052        // lsl  r2, #0x1            @ Shifts bit in the right place.
     SHORT 0x4313        // orr  r3, r2              @ Before adding it to the tutorial/nottutorial mask.
+  
+  // During Copy Data, don't allow iron saves to be selected.
+  ORG 0xABA34
+    jumpToHack(IMM_jumpToCopyDataSlotMove)
+  ORG 0xA9134
+    POIN IMM_jumpToFindInitialCopyDataSave
 
 POP
 
+ALIGN 4; IMM_jumpToCopyDataSlotMove:
+SHORT 0x4660        // mov  r0, r12     @ Moves SaveMenuProc into arg r0.
+SHORT 0x1C29        // mov  r1, r5      @ Moves previous saveslot into arg r1.
+SHORT 0x0612        // lsl  r2, #0x18   @ Just easier this way.
+SHORT 0x1612        // asr  r2, #0x18
+SHORT 0x4B01        // ldr  r3, =IMM_copyDataSlotMove
+WORD  0xF803F000    // bl   GOTO_R3
+SHORT 0xE002;       // branch over literal and bx.
+POIN IMM_copyDataSlotMove|1
+SHORT 0x4718        // bx   r3    @ GOTO_R3 label would be right before this.
+SHORT 0xBC30        // pop  {r4, r5}
+SHORT 0xBC02        // pop  {r1}
+SHORT 0x4708        // bx   r1
+
+ALIGN 4; IMM_jumpToFindInitialCopyDataSave:
+SHORT 0x0000        // Pad.
+SHORT 0x1C28        // mov  r0, r5  @ move Proc* to r0, so C function can access it.
+SHORT 0x4B01        // ldr  r3, =IMM_findInitialCopyDataSave
+WORD  0xF803F000    // bl   GOTO_R3
+SHORT 0xE002;       // branch over literal and bx.
+POIN IMM_findInitialCopyDataSave|1
+SHORT 0x4718        // bx   r3    @ GOTO_R3 label would be right before this.
+SHORT 0xBC70        // pop  {r4-r6}
+SHORT 0xBC01        // pop  {r0}
+SHORT 0x4700        // bx   r0
+
 ALIGN 4; IMM_difficultyDescriptions:
+MESSAGE Difficulty description textIDs at CurrentOffset
 SHORT 0x0149 0x014A 0x014B 0x0000     // Easy/Normal/Difficult
 SHORT 0x0609 0x0354 0x0000 0x0000     // Classic/Iron
