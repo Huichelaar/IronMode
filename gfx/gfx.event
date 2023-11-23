@@ -1,0 +1,27 @@
+PUSH
+
+  ORG 0xAC188
+    POIN IMM_difficultySelectGfx
+  ORG 0xA07C18
+    #incbin "difficultySelectPalette.dmp"
+    #incbin "difficultyUnSelectPalette.dmp"
+
+POP
+
+ALIGN 4; IMM_difficultySelectGfx:
+#incbin "difficultySelect.dmp"
+
+// Options OAM.
+ALIGN 4; IMM_classicTextOAM:
+SHORT 2
+SHORT 0x4008 0x802B 0x08D2
+SHORT 0x0008 0x404B 0x08D6
+
+ALIGN 4; IMM_ironTextOAM:
+SHORT 1
+SHORT 0x4008 0x8034 0x08D8
+
+// Cursor Y and X pos.
+ALIGN 4; IMM_difficultyCursorMove:
+BYTE 0x00 0x30 0x00 0x00
+BYTE 0x00 0x50 0x00 0x00

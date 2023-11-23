@@ -1,0 +1,49 @@
+// C
+#include "C/main.lyn.event"
+
+PUSH
+
+  // Replace palette-loading function for difficulty modes.
+  ORG 0xABD88
+    jumpToHack(IMM_loadPals)
+  
+  ORG 0xAC3F0   // Replace difficulty select proc.
+    POIN IMM_difficultySelectProc
+  ORG 0xAC392   // Move to label 3 after selecting difficulty level.
+    BYTE 0x3
+  ORG 0xA20B20  // Replace difficulty sprite drawing init.
+    POIN IMM_drawDifficultySpritesInit|1
+  ORG 0xA20B30  // Replace difficulty sprite drawing loop.
+    POIN IMM_drawDifficultySpritesLoop|1
+  
+  // Draw new text for Classic and Iron difficulty options.
+  ORG 0xABFF8
+    SHORT 0x78E0        // ldrb  r0, [r4, #0x3]      @ r0 = difficultyType.
+    SHORT 0x00C0        // lsl   r0, #0x3
+    SHORT 0x4908        // ldr   r1, =IMM_difficultyDescriptions
+    SHORT 0x1809        // add   r1, r0
+    SHORT 0x3630        // add   r6, #0x30
+    SHORT 0x3C28        // sub   r4, #0x28
+    SHORT 0x7830        // ldrb  r0, [r6]
+    SHORT 0x0040        // lsl   r0, #0x1
+    SHORT 0x5A08        // ldrh  r0, [r1, r0]
+  ORG 0xAC020
+    POIN IMM_difficultyDescriptions
+
+  // Store iron mode in chapterData when creating new save.
+  ORG 0x30D2E   // Mask Iron/Classic bit here as well as tutorial/nottutorial.
+    BYTE 0x03
+  ORG 0xA9252   // orr Iron/Classic bit with tutorial bit when creating new savegame.
+    SHORT 0x302C        // add  r0, #0x2C           @ We create redundancy
+    SHORT 0x1E82        // sub  r2, r0, #0x2        @ later in this function.
+  ORG 0xA927C
+    SHORT 0x7C42        // ldrb r2, [r0, #0x11]     @ Loads saveMenuProc +0x3D, which holds Iron/Classic bit.
+    SHORT 0x7800        // ldrb r0, [r0]            @ Vanilla.
+    SHORT 0x0052        // lsl  r2, #0x1            @ Shifts bit in the right place.
+    SHORT 0x4313        // orr  r3, r2              @ Before adding it to the tutorial/nottutorial mask.
+
+POP
+
+ALIGN 4; IMM_difficultyDescriptions:
+SHORT 0x0149 0x014A 0x014B 0x0000     // Easy/Normal/Difficult
+SHORT 0x0609 0x0354 0x0000 0x0000     // Classic/Iron

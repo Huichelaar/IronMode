@@ -11,3 +11,8 @@
 	ORG FreeSpace
 #endif
 
+// Code.
+#include "src/src.event"
+
+// Graphics.
+#include "gfx/gfx.event"
